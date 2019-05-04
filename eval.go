@@ -14,12 +14,23 @@ import (
 
 func (e *setExpr) eval(app *app, args []string) {
 	switch e.opt {
+	case "preview_img":
+		gOpts.preview_img = true
+		go app.nav.WaitImages(&app.ui.wins)
+	case "nopreview_img":
+		gOpts.preview_img = false
 	case "anchorfind":
 		gOpts.anchorfind = true
 	case "noanchorfind":
 		gOpts.anchorfind = false
 	case "anchorfind!":
 		gOpts.anchorfind = !gOpts.anchorfind
+	case "icons":
+		gOpts.icons = true
+	case "noicons":
+		gOpts.icons = false
+	case "icons!":
+		gOpts.icons = !gOpts.icons
 	case "color256":
 		gOpts.color256 = true
 		setColorMode()

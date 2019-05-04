@@ -201,6 +201,7 @@ type nav struct {
 	moveTotalChan chan int
 	dirChan       chan *dir
 	regChan       chan *reg
+	imgChan       chan string
 	dirCache      map[string]*dir
 	regCache      map[string]*reg
 	saves         map[string]bool
@@ -218,6 +219,11 @@ type nav struct {
 
 func (nav *nav) loadDir(path string) *dir {
 	d, ok := nav.dirCache[path]
+
+	select{
+		case nav.imgChan <- path:
+		default:
+	}
 	if !ok {
 		go func() {
 			d := newDir(path)
@@ -274,6 +280,45 @@ func (nav *nav) getDirs(wd string) {
 	nav.dirs = dirs
 }
 
+func (nav *nav) WaitImages(wins *[]*win){
+	//Starts Ueberzug instance and feeds new images to it
+
+
+	cmd  := exec.Command("ueberzug","layer")
+	in, err := cmd.StdinPipe();
+	if err != nil{
+		log.Fatalf("Error creating pipe: %s", err.Error())
+		return
+	}
+	if err := cmd.Start(); nil != err {
+		log.Fatalf("Error starting program: %s, %s", cmd.Path, err.Error())
+		return
+	}
+	drawn := false
+	for {
+		imgPath := <- nav.imgChan
+		var com string
+		if strings.Index(imgPath,".png") != -1 || strings.Index(imgPath,".jpg") != -1{
+			win := (*wins)[len(*wins) - 1]
+			com = fmt.Sprintf(`{"identifier":"lf", "action": "add",  "x": "%d", "y": "%d", "width": "%d","height": "%d","path": "%s","scaler":"fit_contain"}
+			` ,win.x,win.y,win.w-1,win.h,imgPath)
+			drawn = true
+		}else if drawn{
+			com = "{\"identifier\":\"lf\",\"action\": \"remove\"}\n"
+			drawn = false
+		}else{
+			continue
+		}
+
+		bcom := []byte(com)
+		_, err := in.Write(bcom)
+		if err != nil{
+			log.Println(err)
+			return
+		}
+	}
+}
+
 func newNav(height int) *nav {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -287,6 +332,7 @@ func newNav(height int) *nav {
 		moveTotalChan: make(chan int, 1024),
 		dirChan:       make(chan *dir),
 		regChan:       make(chan *reg),
+		imgChan:       make(chan string),
 		dirCache:      make(map[string]*dir),
 		regCache:      make(map[string]*reg),
 		saves:         make(map[string]bool),
@@ -295,6 +341,7 @@ func newNav(height int) *nav {
 		selectionInd:  0,
 		height:        height,
 	}
+
 
 	nav.getDirs(wd)
 
@@ -413,6 +460,10 @@ func (nav *nav) preview() {
 
 func (nav *nav) loadReg(ui *ui, path string) *reg {
 	r, ok := nav.regCache[path]
+	select{
+		case nav.imgChan <- path:
+		default:
+	}
 	if !ok {
 		go nav.preview()
 		r := &reg{loading: true, path: path}

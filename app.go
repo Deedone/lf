@@ -34,6 +34,10 @@ func newApp() *app {
 	ui := newUI()
 	nav := newNav(ui.wins[0].h)
 
+	if gOpts.preview_img {
+		go nav.WaitImages(&ui.wins)
+	}
+
 	return &app{
 		ui:       ui,
 		nav:      nav,
