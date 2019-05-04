@@ -25,6 +25,7 @@ type sortType struct {
 }
 
 var gOpts struct {
+	preview_img    bool
 	icons 				 bool
 	anchorfind     bool
 	color256       bool
@@ -61,6 +62,7 @@ var gOpts struct {
 }
 
 func init() {
+	gOpts.preview_img = false
 	gOpts.icons = false
 	gOpts.anchorfind = true
 	gOpts.color256 = false

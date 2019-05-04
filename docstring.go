@@ -100,6 +100,7 @@ keybindings:
 The following options can be used to customize the behavior of lf:
 
         anchorfind      boolean  (default on)
+    		preview_img     boolean  (default off)
         color256        boolean  (default off)
         dircounts       boolean  (default off)
         dirfirst        boolean  (default on)

@@ -14,6 +14,11 @@ import (
 
 func (e *setExpr) eval(app *app, args []string) {
 	switch e.opt {
+	case "preview_img":
+		gOpts.preview_img = true
+		go app.nav.WaitImages(&app.ui.wins)
+	case "nopreview_img":
+		gOpts.preview_img = false
 	case "anchorfind":
 		gOpts.anchorfind = true
 	case "noanchorfind":
