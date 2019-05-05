@@ -29,7 +29,10 @@ See [faq](https://github.com/gokcehan/lf/wiki/FAQ) for more information and [tut
 - Configuration with shell commands
 - Customizable keybindings (vi and readline defaults)
 - Preview filtering (for source highlight, archives, pdfs/images as text etc.)
+
+## This fork features
 - Image previews (set preview_img)(You will need to install [Ueberzug](https://github.com/seebye/ueberzug#installation))
+- Icons for popular filetypes and certain folders(set icons)(requieres [NerdFont](https://github.com/ryanoasis/nerd-fonts)) 
 
 
 ## Non-Features
